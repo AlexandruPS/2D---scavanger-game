@@ -5,14 +5,22 @@
 #include "Vector2D.h"
 #include "Collision.h"
 
-
+//10:02
 Map* map;
 
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
 Manager manager;
+
+std::vector<ColliderComponent*> Game::colliders;
+
+
 auto& Player(manager.addEntity());
 auto& wall(manager.addEntity());
+
+auto& tile0(manager.addEntity());
+auto& tile1(manager.addEntity());
+auto& tile2(manager.addEntity());
 
 Game::Game()
 {}
@@ -47,6 +55,12 @@ void Game :: init(const char* title, int xpos, int ypos, int width, int heigh, b
 	
 	map = new Map();
 
+	tile0.addComponent<TileComponent>(200, 200, 32, 32, 0);
+	tile1.addComponent<TileComponent>(250, 250, 32, 32, 1);
+	tile1.addComponent<ColliderComponent>("Dirt");
+	tile2.addComponent<TileComponent>(150, 150, 32, 32, 2);
+	tile2.addComponent<ColliderComponent>("Grass");
+
 	Player.addComponent<TransformComponent>(2);
 	Player.addComponent<SpriteComponent>("Assets/Player.png");
 	Player.addComponent<KeyboardController>();
@@ -56,7 +70,7 @@ void Game :: init(const char* title, int xpos, int ypos, int width, int heigh, b
 	wall.addComponent<SpriteComponent>("Assets/Dirt.png");
 	wall.addComponent<ColliderComponent>("wall");
 
-	std::cout << wall.getComponent<ColliderComponent>().collider.x;
+	
 
 }
 
@@ -77,22 +91,18 @@ void Game :: update()
 { 
 	manager.refresh();
 	manager.update();
-
-	
-	//if (Collision::AABB(Player.getComponent<ColliderComponent>().collider,
-	//					wall.getComponent<ColliderComponent>().collider))
-	//{
-
-	//	std::cout << Player.getComponent<ColliderComponent>().collider.x;
-		//std::cout << "Wall hit" << std::endl;
-	//}
+	for (auto cc : colliders)
+	{
+		Collision::AABB(Player.getComponent<ColliderComponent>(), *cc);
+		
+	}
 	
 }
 void Game::render()
 {
 	SDL_RenderClear(renderer);
 	// aici adaugam lucruri de randat
-	map->DrawMap();
+	//map->DrawMap();
 	manager.draw();
 	SDL_RenderPresent(renderer);
 

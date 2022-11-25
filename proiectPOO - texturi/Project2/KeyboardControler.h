@@ -7,7 +7,7 @@
 class KeyboardController : public Component
 {
 public:
-	TransformComponent* transform;
+	TransformComponent *transform;
 
 	void init() override
 	{
